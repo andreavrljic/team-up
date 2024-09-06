@@ -4,6 +4,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
+import { collection, getDocs, getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -45,6 +46,20 @@ const signInUser = async (email: string, password: string) => {
   } catch (error) {
     console.error('Error signing in', error);
   }
+};
+
+initializeApp(firebaseConfig);
+//init
+const db = getFirestore();
+
+export const fetchFirebaseData = async (collectionName: string) => {
+  //collection reference
+  const collectionRef = await getDocs(collection(db, collectionName));
+  let data: any = [];
+  collectionRef.forEach((doc) => {
+    data.push({ ...doc.data(), id: doc.id });
+  });
+  return data;
 };
 
 export { app, auth, registerUser, signInUser };
