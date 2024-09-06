@@ -4,7 +4,13 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import {
+  collection,
+  DocumentData,
+  getDocs,
+  getFirestore,
+  QuerySnapshot,
+} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -50,11 +56,21 @@ const signInUser = async (email: string, password: string) => {
 
 initializeApp(firebaseConfig);
 //init
-const db = getFirestore();
+export const db = getFirestore();
 
 export const fetchFirebaseData = async (collectionName: string) => {
   //collection reference
   const collectionRef = await getDocs(collection(db, collectionName));
+  let data: any = [];
+  collectionRef.forEach((doc) => {
+    data.push({ ...doc.data(), id: doc.id });
+  });
+  return data;
+};
+
+export const extractData = (
+  collectionRef: QuerySnapshot<DocumentData, DocumentData>
+) => {
   let data: any = [];
   collectionRef.forEach((doc) => {
     data.push({ ...doc.data(), id: doc.id });

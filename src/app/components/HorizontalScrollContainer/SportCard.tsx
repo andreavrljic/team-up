@@ -7,19 +7,28 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { flexColumn } from '@/theme/sharedStyle';
 
 export type SportCardProps<SportType extends string> = {
   sportName: SportType;
   image: string;
+  type: string | number;
 };
 
 const SportCard = <SportType extends string>({
   sportName,
   image,
+  type,
 }: SportCardProps<SportType>) => {
+  const router = useRouter();
   const [imageSrc, setImageSrc] = useState<string>(image);
   const handleImageError = () => {
     setImageSrc('/images/default.jpg');
+  };
+
+  const handleJoinSportGames = () => {
+    router.push(`/${type}/matches`);
   };
 
   return (
@@ -36,8 +45,13 @@ const SportCard = <SportType extends string>({
           {sportName}
         </Typography>
       </CardContent>
-      <CardActions sx={{ justifyContent: 'end' }}>
-        <Button size='small'>Join</Button>
+      <CardActions sx={{ alignItems: 'end', ...flexColumn }}>
+        <Button onClick={handleJoinSportGames} size='small'>
+          See all games
+        </Button>
+        <Button onClick={handleJoinSportGames} size='small'>
+          Create new game
+        </Button>
       </CardActions>
     </Card>
   );

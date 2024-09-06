@@ -1,10 +1,9 @@
 'use client';
 import { flexColumn } from '@/theme/sharedStyle';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useRef } from 'react';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { getSports } from '@/app/api/api';
 import SportCard from './SportCard';
 
 type HorizontalScrollContainerType = {
@@ -35,9 +34,8 @@ const HorizontalScrollContainer = ({
   };
 
   return (
-    <Box sx={{ ...flexColumn }}>
-      <Typography>{title}</Typography>
-      <Button onClick={async () => await getSports()}>Get data</Button>
+    <Box sx={{ ...flexColumn, gap: '1rem' }}>
+      <Typography variant='h5'>{title}</Typography>
       <Box
         ref={scrollContainerRef}
         sx={{
@@ -50,7 +48,7 @@ const HorizontalScrollContainer = ({
             display: 'none',
           },
           scrollbarWidth: 'none',
-          '-ms-overflow-style': 'none',
+          msOverflowStyle: 'none',
           alignItems: 'center',
         }}
       >
@@ -63,6 +61,7 @@ const HorizontalScrollContainer = ({
             bgcolor: 'transparent',
             borderRadius: '50%',
           }}
+          size='large'
         >
           <ChevronLeftIcon />
         </IconButton>
@@ -75,13 +74,19 @@ const HorizontalScrollContainer = ({
             bgcolor: 'transparent',
             borderRadius: '50%',
           }}
+          size='large'
         >
           <ChevronRightIcon />
         </IconButton>
         {items.map((item, index) => {
           const imageLink = `/images/${item.type}.jpg`;
           return (
-            <SportCard key={index} image={imageLink} sportName={item.label} />
+            <SportCard
+              key={index}
+              image={imageLink}
+              sportName={item.label}
+              type={item.type}
+            />
           );
         })}
       </Box>

@@ -5,3 +5,7 @@ export const green = {
 export const orange = {
   primary: '#FF8C21',
 };
+
+export const white = {
+  bone: '#F9F6EE	',
+};

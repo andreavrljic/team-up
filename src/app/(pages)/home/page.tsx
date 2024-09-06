@@ -25,12 +25,8 @@ const Home = () => {
   });
 
   return (
-    <Box sx={{ ...flexColumn, flex: 1 }}>
-      Home page
-      <HorizontalScrollContainer
-        title='Horizontal line'
-        items={horizontalItems}
-      />
+    <Box sx={{ ...flexColumn, flex: 1, padding: '0.5rem' }}>
+      <HorizontalScrollContainer title='Games' items={horizontalItems} />
     </Box>
   );
 };
