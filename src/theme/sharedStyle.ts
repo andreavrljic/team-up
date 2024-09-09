@@ -9,7 +9,5 @@ export const flexColumn = {
 };
 
 export const linearGradient = (topColor: string, bottomColor: string) => {
-  const a = `linear-gradient(to bottom left,${topColor}, ${bottomColor})`;
-  console.log('da', a);
-  return a;
+  return `linear-gradient(to bottom left,${topColor}, ${bottomColor})`;
 };

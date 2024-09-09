@@ -77,8 +77,8 @@ const CardDetails = ({ cardItems }: ListCardProp) => {
           })}
         </Box>
       </Box>
-      {cardItems.cardContent.button?.map((button) => (
-        <Button variant={button.variant} {...button}>
+      {cardItems.cardContent.button?.map((button, index) => (
+        <Button key={index} variant={button.variant} {...button}>
           {button.children}
         </Button>
       ))}

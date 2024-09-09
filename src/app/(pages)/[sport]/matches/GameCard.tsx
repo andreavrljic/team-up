@@ -1,10 +1,13 @@
 import CardDetails, { CardItems } from '@/app/components/CardDetails';
 import { GameType, SportLabel } from '@/app/types';
 import { orange } from '@/theme/colors';
+import { useRouter } from 'next/navigation';
 
 type GameCardProps = { gameDetails: GameType };
 
 const GameCard = ({ gameDetails }: GameCardProps) => {
+  const router = useRouter();
+
   const freePlayer = gameDetails.players.length < gameDetails.maxPlayers;
   const cardItems: CardItems = {
     cardContent: {
@@ -28,6 +31,8 @@ const GameCard = ({ gameDetails }: GameCardProps) => {
           variant: 'contained',
           color: 'warning',
           disabled: !freePlayer,
+          onClick: () =>
+            router.push(`/${gameDetails.type}/matches/${gameDetails.id}`),
         },
       ],
     },

@@ -1,5 +1,6 @@
 'use client';
 
+import FilterSports from '@/app/components/FilterSport/FilterSports';
 import HorizontalScrollContainer, {
   HorizontalItemType,
 } from '@/app/components/HorizontalScrollContainer/HorizontalScrollContainer';
@@ -26,6 +27,7 @@ const Home = () => {
 
   return (
     <Box sx={{ ...flexColumn, flex: 1, padding: '0.5rem' }}>
+      <FilterSports sports={sports} />
       <HorizontalScrollContainer title='Games' items={horizontalItems} />
     </Box>
   );

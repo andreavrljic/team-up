@@ -1,5 +1,5 @@
 'use client';
-import { getGames } from '@/app/api/api';
+import { getGames, getGamesByType } from '@/app/api/api';
 import { GameType, SportLabel, SportType } from '@/app/types';
 import { Box, Typography } from '@mui/material';
 import { useParams } from 'next/navigation';
@@ -13,7 +13,7 @@ const SportMatches = () => {
 
   useEffect(() => {
     (async () => {
-      const res = await getGames();
+      const res = await getGamesByType(param.sport as SportType);
       if (res) {
         setGames(res || []);
       }
@@ -21,7 +21,7 @@ const SportMatches = () => {
   }, []);
 
   return (
-    <Box sx={{ ...flexColumn, padding: '0.5rem', gap: '1rem' }}>
+    <Box sx={{ ...flexColumn, padding: '0.5rem', gap: '1rem', flex: 1 }}>
       <Typography variant='h2'>
         {SportLabel[param.sport as SportType]}
       </Typography>
