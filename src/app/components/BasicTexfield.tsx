@@ -1,5 +1,4 @@
 import { TextField, TextFieldProps } from '@mui/material';
-import { useEffect } from 'react';
 import { FieldValues, Path, UseFormReturn } from 'react-hook-form';
 
 type BasicTetxfieldProps<FormType extends FieldValues> = {
@@ -11,9 +10,11 @@ const BasicTextfield = <FormType extends FieldValues>({
   label,
   form,
   id,
+  disabled,
 }: BasicTetxfieldProps<FormType>) => {
   const {
     register,
+    watch,
     formState: { errors },
   } = form;
 
@@ -26,6 +27,8 @@ const BasicTextfield = <FormType extends FieldValues>({
       label={label}
       error={!!errors[id]}
       helperText={errors[id]?.message?.toString() ?? ''}
+      disabled={disabled}
+      slotProps={{ inputLabel: { shrink: !!watch(id) } }}
     />
   );
 };

@@ -1,16 +1,31 @@
+import { LoginFormType, UpdateUserProfileType } from '@/app/types';
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
+  UserCredential,
+  User,
 } from 'firebase/auth';
 import {
   collection,
+  doc,
   DocumentData,
   getDocs,
   getFirestore,
   QuerySnapshot,
+  setDoc,
+  updateDoc,
 } from 'firebase/firestore';
+import {
+  FirebaseStorage,
+  getDownloadURL,
+  getStorage,
+  uploadBytes,
+  ref as refStorage,
+} from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,15 +41,38 @@ const app: FirebaseApp = !getApps().length
   : getApp();
 
 const auth = getAuth(app);
+const storage: FirebaseStorage = getStorage(app);
 
-const registerUser = async (email: string, password: string) => {
+const registerUser = async (registerUser: LoginFormType) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(
+    const {
+      email,
+      age,
+      password,
+      phoneNumber,
+      username: username,
+    } = registerUser;
+    const userCredential: UserCredential = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
+    const user: User = userCredential.user;
+    await updateProfile(user, {
+      displayName: username,
+    });
 
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(
+      userRef,
+      {
+        email: user.email,
+        username: username,
+        age: age,
+        phoneNumber: phoneNumber,
+      },
+      { merge: true }
+    );
     console.log('Successfully registered', userCredential.user);
   } catch (error) {
     console.error('Error registering user:', error);
@@ -51,6 +89,59 @@ const signInUser = async (email: string, password: string) => {
     console.log('Successfully signed in user', userCredentials);
   } catch (error) {
     console.error('Error signing in', error);
+  }
+};
+
+export const sendResetEmail = async (email: string) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+  } catch (error) {
+    console.log('Send reset password email error ', error);
+  }
+};
+
+export const updateUserData = async (
+  user: User,
+  profileUpdates: UpdateUserProfileType,
+  file: File | null
+) => {
+  try {
+    const imageUrl = file && (await uploadImageToFirebase(file, user.uid));
+    if (profileUpdates.username) {
+      await updateProfile(user, {
+        displayName: profileUpdates.username,
+        photoURL: imageUrl,
+      });
+    }
+
+    const userRef = doc(db, 'users', user.uid);
+    await updateDoc(userRef, {
+      username: profileUpdates.username || user.displayName,
+      age: profileUpdates.age,
+      phoneNumber: profileUpdates.phoneNumber,
+      photoURL: imageUrl,
+    });
+    console.log('User data updated successfully');
+  } catch (error) {
+    console.error('Error updating user data:', error);
+  }
+};
+
+export const uploadImageToFirebase = async (file: File, userId: string) => {
+  try {
+    // Create a reference to the file location
+    const storageRef = refStorage(
+      storage,
+      `profile_images/${userId}/profile.jpg`
+    );
+    // Upload the file to Firebase Storage
+    const snapshot = await uploadBytes(storageRef, file);
+    // Get the download URL for the uploaded file
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
   }
 };
 

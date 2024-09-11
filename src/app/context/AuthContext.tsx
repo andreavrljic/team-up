@@ -9,8 +9,9 @@ import {
   User,
   UserCredential,
 } from 'firebase/auth';
-import { auth } from '@/firebase/config';
+import { auth, db } from '@/firebase/config';
 import { useRouter } from 'next/navigation';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 type AuthContextReturnType = {
   user: User | null;
@@ -26,10 +27,23 @@ export const AuthContextProvider = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+
   const googleSignIn = async () => {
-    console.log(';lk');
     const provider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, provider);
+
+    const { user } = userCredential;
+    const uid = user.uid;
+
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    if (!userDoc.exists()) {
+      await setDoc(doc(db, 'users', uid), {
+        email: user.email,
+        photoURL: user.photoURL,
+        username: user.displayName,
+      });
+    }
+
     return userCredential;
   };
 

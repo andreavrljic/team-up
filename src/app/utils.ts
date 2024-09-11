@@ -68,3 +68,7 @@ export const checkPasswordRequirements = (
 ): Record<keyof PasswordRequirements, boolean> => {
   return checkValueRequirements(password, passwordRequirements);
 };
+
+export const setIsGoogleLogged = () => {
+  localStorage.setItem('isGoogleAccount', 'true');
+};

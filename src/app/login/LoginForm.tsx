@@ -3,7 +3,7 @@ import BasicTextfield from '@/app/components/BasicTexfield';
 import { flexColumn, flexRow } from '@/theme/sharedStyle';
 import { Box, Divider, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import { registerUser, signInUser } from '@/firebase/config';
+import { registerUser, sendResetEmail, signInUser } from '@/firebase/config';
 import { UserAuth } from '@/app/context/AuthContext';
 import GoogleIcon from '@mui/icons-material/Google';
 import { DeviceContext } from '@/app/context/DeviceTypeContext';
@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import { LoginFormType } from '../types';
 import { LoginSchema } from '../zodFormType';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { setIsGoogleLogged } from '../utils';
 
 const LoginForm = () => {
   const deviceType = useContext(DeviceContext);
@@ -39,7 +40,7 @@ const LoginForm = () => {
   const handleSigningSubmit = () => {
     const loginFormValue = getValues();
     if (signUp) {
-      registerUser(loginFormValue.email, loginFormValue.password);
+      registerUser(loginFormValue);
       router.push('/welcome');
     } else {
       signInUser(loginFormValue.email, loginFormValue.password);
@@ -51,6 +52,7 @@ const LoginForm = () => {
     try {
       const result = await googleSignIn();
       if (result.user) {
+        setIsGoogleLogged();
         router.push('/home');
       }
     } catch (error) {
@@ -85,13 +87,31 @@ const LoginForm = () => {
           <BasicTextfield form={loginForm} id={'username'} label={'Username'} />
         )}
         <BasicTextfield form={loginForm} id={'email'} label={'E-mail'} />
-        <BasicTextfield form={loginForm} id={'password'} label={'Password'} />
+        <Box sx={{ ...flexColumn }}>
+          <BasicTextfield form={loginForm} id={'password'} label={'Password'} />
+          <Typography
+            onClick={() => {
+              sendResetEmail(watch('email'));
+            }}
+          >
+            Forgot password?
+          </Typography>
+        </Box>
+
         {signUp && (
-          <BasicTextfield
-            form={loginForm}
-            id={'confirmPassword'}
-            label={'Confirm password'}
-          />
+          <>
+            <BasicTextfield
+              form={loginForm}
+              id={'confirmPassword'}
+              label={'Confirm password'}
+            />
+            <BasicTextfield form={loginForm} id={'age'} label={'Age'} />{' '}
+            <BasicTextfield
+              form={loginForm}
+              id={'phoneNumber'}
+              label={'Phone Number'}
+            />
+          </>
         )}
 
         <TUButton

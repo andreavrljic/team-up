@@ -8,14 +8,44 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuOpenOutlinedIcon from '@mui/icons-material/MenuOpenOutlined';
 import { UserAuth } from '../context/AuthContext';
+import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import BackButton from './BackButton';
+import { flexRow } from '@/theme/sharedStyle';
 
 const SidebarDrawer = () => {
   const auth = UserAuth();
   const [open, setOpen] = React.useState(false);
+  const router = useRouter();
+
+  const handleLogOut = () => {
+    auth.logOut();
+    localStorage.clear();
+  };
+
+  const SideBarItems = useMemo(
+    () =>
+      ({
+        settings: {
+          label: 'Settings',
+          icon: <SettingsIcon />,
+          action: () => router.push('/settings'),
+        },
+        logout: {
+          label: 'Log out',
+          icon: <LogoutIcon />,
+          action: handleLogOut,
+        },
+      } satisfies Record<
+        string,
+        { label: string; icon: JSX.Element; action: () => void }
+      >),
+    []
+  );
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -24,13 +54,11 @@ const SidebarDrawer = () => {
   const DrawerList = (
     <Box sx={{ width: 250 }} role='presentation' onClick={toggleDrawer(false)}>
       <List>
-        {['Inbox', 'Send email', 'Logout'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton onClick={auth.logOut}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+        {Object.entries(SideBarItems).map(([key, value]) => (
+          <ListItem key={key} disablePadding>
+            <ListItemButton onClick={value.action}>
+              <ListItemIcon>{value.icon}</ListItemIcon>
+              <ListItemText primary={value.label} />
             </ListItemButton>
           </ListItem>
         ))}
@@ -39,8 +67,11 @@ const SidebarDrawer = () => {
   );
 
   return (
-    <Box sx={{ padding: '0.5rem' }}>
+    <Box
+      sx={{ padding: '0.5rem', ...flexRow, justifyContent: 'space-between' }}
+    >
       <Button
+        color='warning'
         variant={'text'}
         onClick={toggleDrawer(true)}
         startIcon={<MenuOpenOutlinedIcon />}
@@ -48,6 +79,7 @@ const SidebarDrawer = () => {
       >
         MENU
       </Button>
+      <BackButton />
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
